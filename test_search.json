@@ -1,0 +1,8 @@
+{
+    "query": "wordpress",
+    "severity": [
+        "critical"
+    ],
+    "cvss_score_min": 7.0,
+    "limit": 5
+}
