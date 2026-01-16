@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from api.v1 import nuclei, vulnx_search, searches, alerts, ingestion
+from api.v1 import vulnx_search, searches, alerts, ingestion
 from core.database import init_db
 from services.vulnx_installer import initialize_vulnx
 from database import init_db as init_search_db, SessionLocal
@@ -55,7 +55,7 @@ app = FastAPI(
     *   **Advanced CVE Search**: Filter by severity, CVSS/EPSS scores, KEV status, and more.
     *   **Multi-Source Data Ingestion**: Aggregates CVE data from NVD, GitHub, and other sources.
     *   **Historical Trends**: Aggregated statistics and timeseries data.
-    *   **Nuclei Scanner**: Modern vulnerability scanning with 7000+ templates.
+
     *   **Notification System**: Real-time alerts via Email and Webhooks for new vulnerabilities.
     *   **Search History**: Track and save complex search queries.
     
@@ -88,7 +88,6 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(nuclei.router, prefix="/api/v1/nuclei", tags=["Nuclei Scanner"])
 app.include_router(vulnx_search.router, prefix="/api/v1/vulnx-search", tags=["CVE Search"])
 app.include_router(ingestion.router, prefix="/api/v1/ingestion", tags=["Data Ingestion"])
 app.include_router(searches.router, prefix="/api/v1", tags=["Search Management"])
