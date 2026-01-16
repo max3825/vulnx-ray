@@ -136,10 +136,6 @@ DATABASE_URL=sqlite:///./vulnxray.db
 ![Data Sources](docs/screenshots/data-sources.png)
 *Multi-source CVE ingestion with automated sync*
 
-### Alert Configuration
-![Alert System](docs/screenshots/alerts.png)
-*Smart alerting with keyword monitoring and scheduling*
-
 ---
 
 ## 🏗️ Architecture
