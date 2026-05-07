@@ -17,8 +17,8 @@ RUN go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
 # Add Go bin to PATH
 ENV PATH="/root/go/bin:${PATH}"
 
-# Nuclei Scanner - Disabled (focusing on CVE analysis only)
-# RUN go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+# Nuclei Scanner
+RUN go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 
 # Copy requirements first for better caching
 COPY requirements.txt .

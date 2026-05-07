@@ -8,24 +8,31 @@ vulnx-ray/
 ├── backend/                       # Python FastAPI Backend
 │   ├── main.py                   # FastAPI application entry point
 │   ├── requirements.txt          # Python dependencies
+│   ├── database.py               # SQLAlchemy config and SessionLocal
 │   │
 │   ├── api/                      # API endpoints
 │   │   ├── __init__.py
 │   │   └── v1/
 │   │       ├── __init__.py
-│   │       └── audit.py          # Audit scan endpoints
+│   │       ├── vulnx_search.py   # CVE search endpoints
+│   │       ├── searches.py       # Search history & saved searches
+│   │       ├── alerts.py         # Alert management endpoints
+│   │       └── ingestion.py      # Data source ingestion endpoints
 │   │
 │   ├── schemas/                  # Pydantic models
 │   │   ├── __init__.py
-│   │   └── audit.py             # Request/Response schemas
+│   │   ├── vulnx_search.py       # Search request/response schemas
+│   │   └── search.py             # History & saved searches schemas
 │   │
 │   ├── services/                 # Business logic
 │   │   ├── __init__.py
-│   │   └── scanner.py           # CMS scanner service
+│   │   ├── vulnx_search_wrapper.py  # Wrapper for vulnx CLI tool
+│   │   └── notification_service.py  # Email and Webhook alerts
 │   │
-│   └── core/                     # Core functionality
+│   └── models/                   # SQLAlchemy database models
 │       ├── __init__.py
-│       └── database.py          # SQLAlchemy models & config
+│       ├── search.py             # SearchHistory and SavedSearch
+│       └── alerts.py             # AlertRule and AlertHistory
 │
 └── frontend/                     # Next.js 14 Frontend
     ├── package.json
@@ -39,10 +46,10 @@ vulnx-ray/
         ├── app/                  # Next.js App Router
         │   ├── layout.tsx       # Root layout
         │   ├── page.tsx         # Homepage
-        │   └── globals.css      # Global styles
+        │   ├── globals.css      # Global styles
+        │   └── cve-search/      # CVE search interface
         │
-        └── utils/               # Utilities
-            └── api.ts           # API client
+        └── components/          # Reusable React components
 ```
 
 ## Backend Structure
@@ -52,61 +59,41 @@ vulnx-ray/
 - CORS middleware configuration
 - Health check endpoint
 - API router inclusion
+- Lifespan events (database init, background task monitoring)
 
 ### API Layer (`api/v1/`)
-- **audit.py**: Scan endpoints
-  - `POST /api/v1/audit/scan` - Execute new scan
-  - `GET /api/v1/audit/scan/{scan_id}` - Get scan result
-  - `GET /api/v1/audit/scans` - List scan history
-
-### Schemas (`schemas/`)
-- **audit.py**: Pydantic models
-  - `ScanRequest` - Scan parameters
-  - `ScanResponse` - Scan results
-  - `Vulnerability` - CVE information
-  - `CMSType` / `SeverityLevel` enums
+- **vulnx_search.py**: Core CVE searching via ProjectDiscovery vulnx
+- **searches.py**: Search history and user's saved queries
+- **alerts.py**: CRUD for alert rules
+- **ingestion.py**: Managing external data sources (NVD, GitHub)
 
 ### Services (`services/`)
-- **scanner.py**: CMS detection engine
-  - WordPress, Joomla, Drupal, Magento detection
-  - Version identification
-  - Vulnerability matching
-  - Passive reconnaissance only
+- **vulnx_search_wrapper.py**: Interfaces asynchronously with the `vulnx` Go binary
+- **notification_service.py**: Runs background loops to check alerts and send notifications
 
-### Core (`core/`)
-- **database.py**: SQLAlchemy configuration
-  - Async SQLite engine
-  - `ScanRecord` model
-  - Session management
+### Database (`database.py` & `models/`)
+- **database.py**: Synchronous SQLite SQLAlchemy engine and declarative base
+- **models/**: SQLAlchemy models for the application's persistent state
 
 ## Frontend Structure
 
 ### App Router (`src/app/`)
-- **layout.tsx**: Root layout with metadata
-- **page.tsx**: Homepage with hero section
-- **globals.css**: Tailwind + custom styles
-
-### Utilities (`src/utils/`)
-- **api.ts**: Axios client for backend
-  - Type-safe API calls
-  - Request/response interfaces
-  - Error handling
+- Next.js 14 structured pages and layouts.
+- Heavy use of Tailwind CSS and Lucide React icons.
 
 ## Technology Stack
 
 **Backend:**
 - Python 3.11+
-- FastAPI (async web framework)
-- SQLAlchemy (async ORM)
-- Requests + BeautifulSoup4 (web scraping)
-- Pydantic (data validation)
+- FastAPI
+- SQLAlchemy (Sync SQLite)
+- External CLI: ProjectDiscovery `vulnx`
 
 **Frontend:**
 - Next.js 14 (App Router)
 - TypeScript
 - Tailwind CSS
-- Axios (HTTP client)
-- Lucide React (icons)
+- Axios
 
 **Database:**
-- SQLite (async via aiosqlite)
+- SQLite (Synchronous)

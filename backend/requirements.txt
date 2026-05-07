@@ -16,10 +16,15 @@ python-dateutil==2.8.2
 
 # Database
 sqlalchemy==2.0.25
-aiosqlite==0.19.0
+psycopg2-binary==2.9.9
+
+# Features
+apscheduler==3.10.4
+reportlab==4.1.0
 
 # CORS & Security
 python-multipart==0.0.6
+slowapi==0.1.9
 
 # Development
 pytest==7.4.4

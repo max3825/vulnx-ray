@@ -1,3 +1,4 @@
+import { apiFetch } from '@/utils/api';
 /**
  * Search history and saved searches utilities
  */
@@ -32,7 +33,7 @@ export async function logSearchHistory(
     resultsCount: number
 ): Promise<void> {
     try {
-        await fetch('/api/v1/searches/history', {
+        await apiFetch('/api/v1/searches/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -51,7 +52,7 @@ export async function logSearchHistory(
  */
 export async function fetchSavedSearches(): Promise<SavedSearch[]> {
     try {
-        const response = await fetch('/api/v1/searches/saved');
+        const response = await apiFetch('/api/v1/searches/saved');
         if (!response.ok) throw new Error('Failed to fet ch saved searches');
         const data = await response.json();
         return data.items || [];
@@ -71,7 +72,7 @@ export async function saveSearch(
     filters: Record<string, any>
 ): Promise<SavedSearch | null> {
     try {
-        const response = await fetch('/api/v1/searches/saved', {
+        const response = await apiFetch('/api/v1/searches/saved', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -99,7 +100,7 @@ export async function saveSearch(
  */
 export async function deleteSavedSearch(id: number): Promise<void> {
     try {
-        const response = await fetch(`/api/v1/searches/saved/${id}`, {
+        const response = await apiFetch(`/api/v1/searches/saved/${id}`, {
             method: 'DELETE'
         });
 
@@ -117,7 +118,7 @@ export async function deleteSavedSearch(id: number): Promise<void> {
  */
 export async function executeSavedSearch(id: number): Promise<Record<string, any>> {
     try {
-        const response = await fetch(`/api/v1/searches/saved/${id}/execute`, {
+        const response = await apiFetch(`/api/v1/searches/saved/${id}/execute`, {
             method: 'POST'
         });
 
@@ -138,7 +139,7 @@ export async function executeSavedSearch(id: number): Promise<Record<string, any
  */
 export async function toggleFavorite(id: number, isFavorite: boolean): Promise<void> {
     try {
-        const response = await fetch(`/api/v1/searches/saved/${id}`, {
+        const response = await apiFetch(`/api/v1/searches/saved/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

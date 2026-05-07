@@ -11,6 +11,7 @@ services:
       - /app/__pycache__
     environment:
       - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://vulnxray:vulnxray_password@db:5432/vulnxray_db
     networks:
       - vulnxray-network
     restart: unless-stopped
@@ -20,6 +21,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    container_name: vulnxray-db
+    environment:
+      POSTGRES_USER: vulnxray
+      POSTGRES_PASSWORD: vulnxray_password
+      POSTGRES_DB: vulnxray_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - vulnxray-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vulnxray -d vulnxray_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
@@ -46,3 +69,4 @@ networks:
 
 volumes:
   backend-data:
+  db-data:

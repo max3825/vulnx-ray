@@ -7,15 +7,20 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 
-# Database file path
+import os
+
+# Database file path for fallback
 DB_PATH = Path(__file__).parent / "vulnxray.db"
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DB_PATH}")
 
 # Create engine
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}  # Needed for SQLite
-)
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}  # Needed for SQLite
+    )
+else:
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -38,5 +43,5 @@ def get_db():
 
 def init_db():
     """Initialize database tables."""
-    from models import search, alerts  # Import models to register them
+    from models import search, alerts, scan, asset  # Import models to register them
     Base.metadata.create_all(bind=engine)

@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = typeof window !== 'undefined' ? `${window.location.origin}/api/v1` : 'http://localhost:8000/api/v1';
+import { apiFetch } from './api';
 
 export interface IngestionJob {
     id: number;
@@ -23,19 +21,27 @@ export interface SourceStatus {
 export const ingestionApi = {
     // Trigger ingestion for a specific source
     runIngestion: async (source: string) => {
-        const response = await axios.post(`${API_BASE_URL}/ingestion/run/${source}`);
-        return response.data;
+        const response = await apiFetch(`/api/v1/ingestion/run/${source}`, {
+            method: 'POST',
+        });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Ingestion failed (${response.status}): ${text}`);
+        }
+        return response.json();
     },
 
     // Get status summary of all sources
     getSourcesStatus: async (): Promise<SourceStatus[]> => {
-        const response = await axios.get(`${API_BASE_URL}/ingestion/sources`);
-        return response.data;
+        const response = await apiFetch('/api/v1/ingestion/sources');
+        if (!response.ok) return [];
+        return response.json();
     },
 
     // Get recent ingestion jobs history
     getRecentJobs: async (limit: number = 10): Promise<IngestionJob[]> => {
-        const response = await axios.get(`${API_BASE_URL}/ingestion/jobs?limit=${limit}`);
-        return response.data;
-    }
+        const response = await apiFetch(`/api/v1/ingestion/jobs?limit=${limit}`);
+        if (!response.ok) return [];
+        return response.json();
+    },
 };

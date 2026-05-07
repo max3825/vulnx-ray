@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, LayoutDashboard, Terminal, Search, Server } from 'lucide-react';
+import { Shield, LayoutDashboard, Terminal, Search, Server, Database } from 'lucide-react';
 
 export default function Navigation() {
     const pathname = usePathname();
@@ -41,6 +41,21 @@ export default function Navigation() {
                         >
                             <Search className="w-4 h-4" />
                             Search
+                        </Link>
+                        <Link
+                            href="/nuclei-scan"
+                            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isActive('/nuclei-scan') ? 'text-white' : 'text-gray-400 hover:text-white'
+                                }`}
+                        >
+                            <Shield className="w-4 h-4" />
+                            Nuclei Scan
+                        </Link>
+                        <Link
+                            href="/assets"
+                            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isActive('/assets') ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+                        >
+                            <Database className="w-4 h-4" />
+                            Assets
                         </Link>
                         <Link
                             href="/alerts"

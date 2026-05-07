@@ -190,21 +190,18 @@ export default function DashboardPage() {
         { range: '8-10', count: 62214 },
     ];
 
-    // Mock monthly trend (last 12 months)
-    const monthlyTrend = [
-        { month: 'Feb', count: 2543 },
-        { month: 'Mar', count: 2876 },
-        { month: 'Apr', count: 3124 },
-        { month: 'May', count: 2987 },
-        { month: 'Jun', count: 3456 },
-        { month: 'Jul', count: 3789 },
-        { month: 'Aug', count: 3654 },
-        { month: 'Sep', count: 4012 },
-        { month: 'Oct', count: 4234 },
-        { month: 'Nov', count: 4456 },
-        { month: 'Dec', count: 4789 },
-        { month: 'Jan', count: 5123 },
-    ];
+    // Dynamic monthly trend — last 12 months ending at the current month
+    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const now = new Date();
+    const currentMonthName = MONTH_NAMES[now.getMonth()];
+    const monthlyTrend = Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+        return {
+            month: MONTH_NAMES[d.getMonth()],
+            // Mock counts — last month closest to current has highest value
+            count: 2543 + Math.floor((i / 11) * 2580 + Math.sin(i) * 300),
+        };
+    });
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
@@ -289,7 +286,7 @@ export default function DashboardPage() {
                         title="This Month"
                         value={thisMonthCVEs}
                         icon={<Calendar className="w-6 h-6 text-cyan-400" />}
-                        trend="Published in January"
+                        trend={`Published in ${currentMonthName}`}
                         gradientFrom="from-cyan-600/20"
                         gradientTo="to-cyan-900/20"
                         delay={0.5}

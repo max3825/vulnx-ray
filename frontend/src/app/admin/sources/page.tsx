@@ -21,6 +21,12 @@ export default function DataSourcesPage() {
     const [jobs, setJobs] = useState<IngestionJob[]>([]);
     const [loading, setLoading] = useState(true);
     const [ingesting, setIngesting] = useState<string | null>(null);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+    const showNotification = (type: 'success' | 'error', msg: string) => {
+        setNotification({ type, msg });
+        setTimeout(() => setNotification(null), 5000);
+    };
 
     const fetchData = async () => {
         try {
@@ -47,12 +53,12 @@ export default function DataSourcesPage() {
     const handleIngest = async (sourceName: string) => {
         setIngesting(sourceName);
         try {
-            await ingestionApi.runIngestion(sourceName);
-            // Refresh immediately to show running job
-            setTimeout(fetchData, 1000);
-        } catch (error) {
+            const result = await ingestionApi.runIngestion(sourceName);
+            showNotification('success', `✅ Ingestion OK — ${result?.stats?.processed ?? 0} processed, ${result?.stats?.added ?? 0} added`);
+            setTimeout(fetchData, 500);
+        } catch (error: any) {
             console.error(`Failed to trigger ingestion for ${sourceName}:`, error);
-            alert('Failed to start ingestion');
+            showNotification('error', `❌ ${error?.message || 'Ingestion failed'}`);
         } finally {
             setIngesting(null);
         }
@@ -87,6 +93,17 @@ export default function DataSourcesPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
             <Navigation />
+
+            {/* Notification Banner */}
+            {notification && (
+                <div className={`fixed top-4 right-4 z-50 max-w-md px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium backdrop-blur-md transition-all ${
+                    notification.type === 'success'
+                        ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                        : 'bg-red-500/20 border-red-500/40 text-red-300'
+                }`}>
+                    {notification.msg}
+                </div>
+            )}
 
             <main className="container mx-auto px-6 py-8 max-w-[1600px]">
                 <div className="flex justify-between items-center mb-8">

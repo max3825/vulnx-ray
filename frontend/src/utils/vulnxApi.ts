@@ -1,3 +1,4 @@
+import { apiFetch } from '@/utils/api';
 // API client for VulnX CVE Search functionality
 
 const API_BASE_URL = '/api/v1/vulnx-search';
@@ -92,7 +93,7 @@ export interface SearchFilters {
  * Search for CVEs with filters
  */
 export async function searchCVEs(filters: SearchFilters): Promise<CVESearchResponse> {
-    const response = await fetch(`${API_BASE_URL}/search`, {
+    const response = await apiFetch(`${API_BASE_URL}/search`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -114,7 +115,7 @@ export async function searchCVEs(filters: SearchFilters): Promise<CVESearchRespo
  * Get detailed information for a specific CVE
  */
 export async function getCVEDetail(cveId: string): Promise<CVEResult> {
-    const response = await fetch(`${API_BASE_URL}/cve/${cveId}`);
+    const response = await apiFetch(`${API_BASE_URL}/cve/${cveId}`);
 
     if (!response.ok) {
         throw new Error(`Failed to fetch CVE details: ${response.statusText}`);
@@ -127,7 +128,7 @@ export async function getCVEDetail(cveId: string): Promise<CVEResult> {
  * Get global CVE statistics
  */
 export async function getDashboardStats(): Promise<DashboardStats> {
-    const response = await fetch(`${API_BASE_URL}/stats`);
+    const response = await apiFetch(`${API_BASE_URL}/stats`);
 
     if (!response.ok) {
         throw new Error(`Failed to fetch stats: ${response.statusText}`);
@@ -140,7 +141,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
  * Get available search filters
  */
 export async function getFilters(): Promise<FiltersResponse> {
-    const response = await fetch(`${API_BASE_URL}/filters`);
+    const response = await apiFetch(`${API_BASE_URL}/filters`);
 
     if (!response.ok) {
         throw new Error(`Failed to fetch filters: ${response.statusText}`);
@@ -153,7 +154,7 @@ export async function getFilters(): Promise<FiltersResponse> {
  * Test vulnx installation
  */
 export async function testVulnxInstallation(): Promise<{ success: boolean; message: string; version?: string }> {
-    const response = await fetch(`${API_BASE_URL}/test`);
+    const response = await apiFetch(`${API_BASE_URL}/test`);
 
     if (!response.ok) {
         throw new Error(`Test failed: ${response.statusText}`);
@@ -193,13 +194,13 @@ export interface AlertRuleCreate {
 }
 
 export async function getAlertRules(): Promise<AlertRule[]> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}`);
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}`);
     if (!response.ok) throw new Error('Failed to fetch alert rules');
     return response.json();
 }
 
 export async function createAlertRule(rule: AlertRuleCreate): Promise<AlertRule> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}`, {
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(rule)
@@ -209,14 +210,14 @@ export async function createAlertRule(rule: AlertRuleCreate): Promise<AlertRule>
 }
 
 export async function deleteAlertRule(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}`, {
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}`, {
         method: 'DELETE'
     });
     if (!response.ok) throw new Error('Failed to delete alert rule');
 }
 
 export async function toggleAlertRule(id: number, isActive: boolean): Promise<AlertRule> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}`, {
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_active: isActive })
@@ -226,14 +227,14 @@ export async function toggleAlertRule(id: number, isActive: boolean): Promise<Al
 }
 
 export async function testAlertRule(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}/test`, {
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${id}/test`, {
         method: 'POST'
     });
     if (!response.ok) throw new Error('Failed to trigger test');
 }
 
 export async function getAlertHistory(ruleId: number): Promise<AlertHistory[]> {
-    const response = await fetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${ruleId}/history`);
+    const response = await apiFetch(`${API_BASE_URL.replace('vulnx-search', 'alerts')}/${ruleId}/history`);
     if (!response.ok) throw new Error('Failed to fetch history');
     return response.json();
 }
